@@ -172,7 +172,7 @@ footer{margin-top:28px;padding-top:12px;border-top:1px solid #e5e7eb;text-align:
   <div class="upload-info">
     <strong data-i18n="upload_title">Datos del dashboard</strong>
     <p id="upload-desc-auto" style="font-size:11px;color:#57606a;margin-top:2px">
-      ⏳ Cargando datos desde <code>data/cierre.xlsx</code>…
+      ⏳ Cargando datos desde SharePoint…
     </p>
     <p data-i18n="upload_desc" id="upload-desc-manual" style="display:none">
       Carga un archivo <strong>.xlsx</strong> de forma manual para previsualizar datos localmente. Arrastra el archivo aquí o usa el botón.
@@ -1310,8 +1310,11 @@ async function autoCargarDesdeRepo() {
   const status     = document.getElementById("file-status");
 
   try {
-    const resp = await fetch("data/cierre.xlsx", { cache: "no-cache" });
-    if (!resp.ok) throw new Error("Archivo no encontrado (HTTP " + resp.status + ")");
+    // Fuente de datos: Excel en SharePoint/OneDrive
+    // Para actualizar los datos, reemplaza este link por el nuevo enlace de descarga
+    const SHAREPOINT_URL = "https://ibm-my.sharepoint.com/:x:/r/yeimi_celis/IQD9nHwDRSmAR6rqHGF3Vc5pAd8Bhua0ZdEv8m4W-P2LDtA?e=Xuplba&download=1";
+    const resp = await fetch(SHAREPOINT_URL, { cache: "no-cache" });
+    if (!resp.ok) throw new Error("No se pudo acceder al archivo de SharePoint (HTTP " + resp.status + "). Verifica que el link sea público.");
 
     const arrayBuffer = await resp.arrayBuffer();
     const wb   = XLSX.read(arrayBuffer, { type: "array" });
