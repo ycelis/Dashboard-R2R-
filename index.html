@@ -902,10 +902,71 @@ function render() {
   renderGraficas(vis);
 }
 
+// ── ESCRITURA EN MONDAY.COM ───────────────────────────────────────────────────
+// Convierte el valor interno del dashboard al label que Monday espera para status
+function estToMondayLabel(est) {
+  if (est === "COMPLETED")  return "Completado";
+  if (est === "IN PROCESS") return "En Proceso";
+  return "No Iniciado";
+}
+
+// Busca el columnId en el item por variantes del título
+function resolveColId(item, ...titles) {
+  if (!item.colIds) return null;
+  for (const title of titles) {
+    // exacto
+    if (item.colIds[title]) return item.colIds[title];
+    // parcial
+    const found = Object.keys(item.colIds).find(k => k.toLowerCase().includes(title.toLowerCase()));
+    if (found) return item.colIds[found];
+  }
+  return null;
+}
+
+// Envía una mutación change_column_value a Monday y muestra feedback en el select/textarea
+async function updateMondayColumn(itemId, boardId, columnId, value, feedbackEl) {
+  if (!itemId || !columnId) {
+    console.warn("updateMondayColumn: falta itemId o columnId", { itemId, columnId });
+    return;
+  }
+  const mutation = `mutation {
+    change_column_value(
+      item_id: ${itemId},
+      board_id: ${boardId},
+      column_id: "${columnId}",
+      value: ${JSON.stringify(JSON.stringify(value))}
+    ) { id }
+  }`;
+  try {
+    if (feedbackEl) feedbackEl.style.outline = "2px solid #f59e0b";
+    const res = await fetch(MONDAY_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": MONDAY_TOKEN,
+        "API-Version": "2024-01"
+      },
+      body: JSON.stringify({ query: mutation })
+    });
+    const json = await res.json();
+    if (json.errors && json.errors.length) throw new Error(json.errors[0].message);
+    if (feedbackEl) { feedbackEl.style.outline = "2px solid #28a745"; setTimeout(()=>{ feedbackEl.style.outline=""; }, 1500); }
+  } catch(err) {
+    console.error("Monday write error:", err.message);
+    if (feedbackEl) { feedbackEl.style.outline = "2px solid #dc3545"; setTimeout(()=>{ feedbackEl.style.outline=""; }, 2000); }
+  }
+}
+
 function guardarComentario(ta) {
   const idx = parseInt(ta.dataset.idx);
   if (isNaN(idx) || !DATA[idx]) return;
   DATA[idx].com = ta.value.trim();
+  // Escribir en Monday si tenemos los IDs
+  const item = DATA[idx];
+  const colId = resolveColId(item, "Comentarios","Comentario","Comments","Comment","COMENTARIOS","comentario","Notes","notes");
+  if (item.mondayId && colId) {
+    updateMondayColumn(item.mondayId, MONDAY_BOARD_ID, colId, DATA[idx].com, ta);
+  }
 }
 
 function autoResize(ta) {
@@ -918,6 +979,12 @@ function cambiarTipo(sel) {
   if (isNaN(idx) || !DATA[idx]) return;
   DATA[idx].tipo = sel.value;
   sel.className = "tipo-select " + (TIPO_CLASS[sel.value] || "t-none");
+  // Escribir en Monday si tenemos los IDs
+  const item = DATA[idx];
+  const colId = resolveColId(item, "Estatus Entregable","Tipo","TIPO","Deliverable Status","Cierre_Tipo","entregable");
+  if (item.mondayId && colId) {
+    updateMondayColumn(item.mondayId, MONDAY_BOARD_ID, colId, sel.value, sel);
+  }
 }
 
 function cambiarEstado(sel) {
@@ -928,6 +995,28 @@ function cambiarEstado(sel) {
   sel.className = "est-select " + (SEL_CLASS[sel.value] || "s-na");
   // recalcular KPIs, barra de progreso, gráficas y alertas sin tocar el tbody
   renderStats();
+  // Escribir en Monday — status columns usan formato JSON especial {label:"..."}
+  const item = DATA[idx];
+  const colId = resolveColId(item, "Estatus Cierre","Estatus","Estado","Status","Estatus_Cierre","estado");
+  if (item.mondayId && colId) {
+    // Para columnas de tipo Status, Monday espera value = JSON.stringify({label:"..."})
+    const mutation = `mutation {
+      change_column_value(
+        item_id: ${item.mondayId},
+        board_id: ${MONDAY_BOARD_ID},
+        column_id: "${colId}",
+        value: ${JSON.stringify(JSON.stringify({ label: estToMondayLabel(sel.value) }))}
+      ) { id }
+    }`;
+    fetch(MONDAY_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": MONDAY_TOKEN, "API-Version": "2024-01" },
+      body: JSON.stringify({ query: mutation })
+    }).then(r => r.json()).then(json => {
+      if (json.errors && json.errors.length) { sel.style.outline="2px solid #dc3545"; setTimeout(()=>{sel.style.outline=""},2000); console.error("Monday status error:", json.errors[0].message); }
+      else { sel.style.outline="2px solid #28a745"; setTimeout(()=>{sel.style.outline=""},1500); }
+    }).catch(e => { console.error(e); sel.style.outline="2px solid #dc3545"; setTimeout(()=>{sel.style.outline=""},2000); });
+  }
 }
 
 function renderStats() {
@@ -1303,6 +1392,138 @@ document.getElementById("btn-lang").addEventListener("click", () => {
   applyLang();
 });
 
+// ── MONDAY.COM API ────────────────────────────────────────────────────────────
+const MONDAY_TOKEN    = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjcwNzgzMDg5NSwiYWFpIjoxMSwidWlkIjo1NDU2ODM2NywiaWFkIjoiMjAyNi0wOS0yNVQxNzowNTozOS4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTM1MzY5ODEsInJnbiI6InVzZTEifQ.ACTqrRPtjpGB1wNiFYzki-f5Ky50x59yiGHDutDOz0A";
+const MONDAY_BOARD_ID = "18432754378";
+const MONDAY_API_URL  = "https://api.monday.com/v2";
+
+// Mapea el label de estado de Monday al valor interno del dashboard
+function normalizarEstadoMonday(label) {
+  if (!label) return "NOT STARTED";
+  const l = label.toUpperCase();
+  if (l === "COMPLETADO" || l === "COMPLETED" || l === "DONE" || l === "FINALIZADO" || l === "CERRADO") return "COMPLETED";
+  if (l === "EN PROCESO" || l === "EN PROGRESO" || l === "IN PROCESS" || l === "WORKING ON IT" || l === "EN COURS") return "IN PROCESS";
+  if (l === "BLOQUEADO" || l === "STUCK") return "NOT STARTED"; // se muestra aparte pero reutiliza slot
+  return "NOT STARTED";
+}
+
+// Extrae el texto de una columna por título (variantes de nombre)
+function colText(columnValues, ...titles) {
+  for (const cv of columnValues) {
+    const t = (cv.column && cv.column.title) ? cv.column.title.trim() : "";
+    if (titles.some(opt => t.toLowerCase() === opt.toLowerCase())) return cv.text || "";
+  }
+  // 2° pasada: coincidencia parcial
+  for (const cv of columnValues) {
+    const t = (cv.column && cv.column.title) ? cv.column.title.trim().toLowerCase() : "";
+    if (titles.some(opt => t.includes(opt.toLowerCase()))) return cv.text || "";
+  }
+  return "";
+}
+
+async function cargarDesdeMondayAPI() {
+  const descAuto   = document.getElementById("upload-desc-auto");
+  const descManual = document.getElementById("upload-desc-manual");
+  const status     = document.getElementById("file-status");
+
+  descAuto.innerHTML = `⏳ Conectando con <strong>Monday.com</strong>…`;
+  descAuto.style.color = "#57606a";
+
+  const query = `{
+    boards(ids: ${MONDAY_BOARD_ID}) {
+      name
+      items_page(limit: 500) {
+        items {
+          id
+          name
+          group { title }
+          column_values {
+            id text
+            column { title }
+          }
+        }
+      }
+    }
+  }`;
+
+  try {
+    const res = await fetch(MONDAY_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": MONDAY_TOKEN,
+        "API-Version": "2024-01"
+      },
+      body: JSON.stringify({ query })
+    });
+
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const json = await res.json();
+
+    if (json.errors && json.errors.length) throw new Error(json.errors[0].message);
+    const board = json.data && json.data.boards && json.data.boards[0];
+    if (!board) throw new Error("Tablero no encontrado.");
+
+    const items = board.items_page.items;
+    if (!items || !items.length) throw new Error("El tablero no tiene items.");
+
+    const nuevos = items.map(item => {
+      const cv = item.column_values || [];
+
+      const estRaw  = colText(cv, "Estatus Cierre","Estatus","Estado","Status","Estatus_Cierre","estado");
+      const diaRaw  = colText(cv, "Dia","Día","DIA","Day","dia");
+      const opRaw   = colText(cv, "Operación","Operacion","Operation","OPERACION","operacion");
+      const respRaw = colText(cv, "Responsable","RESPONSABLE","Owner","Person","responsable","Assignee");
+      const areaRaw = colText(cv, "Areas","Área","Area","AREA","AREAS","area");
+      const paisRaw = colText(cv, "PAISES","Paises","País","Pais","PAIS","Country","pais");
+      const tipoRaw = colText(cv, "Estatus Entregable","Tipo","TIPO","Deliverable Status","Cierre_Tipo","entregable");
+      const comRaw  = colText(cv, "Comentarios","Comentario","Comments","Comment","COMENTARIOS","comentario","Notes","notes");
+
+      // Guardar el ID de Monday y los IDs de columna para poder escribir de vuelta
+      const colIds = {};
+      cv.forEach(c => {
+        if (c.column && c.column.title) colIds[c.column.title.trim()] = c.id;
+      });
+
+      return {
+        n:         item.name.trim(),
+        mondayId:  item.id,          // ID del item en Monday
+        colIds,                       // mapa título→columnId
+        dia:  diaRaw !== "" ? (isNaN(Number(diaRaw)) ? null : Number(diaRaw)) : null,
+        op:   opRaw.trim(),
+        est:  normalizarEstadoMonday(estRaw),
+        resp: respRaw.trim(),
+        area: areaRaw.trim() || (item.group ? item.group.title : ""),
+        pais: paisRaw.trim(),
+        tipo: tipoRaw.trim(),
+        com:  comRaw.trim(),
+      };
+    }).filter(d => d.n);
+
+    if (!nuevos.length) throw new Error("Sin items válidos en el tablero.");
+
+    DATA = nuevos;
+    reconstruirFiltros();
+    render();
+
+    const ahora = new Date().toLocaleString("es-CO", { dateStyle: "medium", timeStyle: "short" });
+    descAuto.innerHTML = `✅ Datos en vivo desde <strong>Monday.com</strong> — <strong>${nuevos.length} actividades</strong> · <span style="font-size:10px;color:#57606a">${ahora}</span>
+      <span style="margin-left:8px;font-size:11px;cursor:pointer;color:#3b82d4" onclick="cargarDesdeMondayAPI()">🔃 Actualizar</span>`;
+    descAuto.style.color = "#1a7a35";
+    status.style.display = "inline-block";
+    status.className = "file-status";
+    status.textContent = `✓ Monday.com — ${nuevos.length} actividades`;
+    descManual.style.display = "none";
+
+  } catch(err) {
+    console.warn("Monday.com API error:", err.message, "— usando fallback Excel.");
+    descAuto.innerHTML = `⚠️ No se pudo conectar con Monday.com (${err.message}). Intentando <code>data/cierre.xlsx</code>…`;
+    descAuto.style.color = "#e6a800";
+    // Fallback al Excel del repositorio
+    autoCargarDesdeRepo();
+  }
+}
+
 // ── AUTO-CARGA DESDE data/cierre.xlsx (GitHub Pages) ────────────────────────
 async function autoCargarDesdeRepo() {
   const descAuto   = document.getElementById("upload-desc-auto");
@@ -1383,8 +1604,8 @@ async function autoCargarDesdeRepo() {
   }
 }
 
-// Inicializar
-autoCargarDesdeRepo();
+// Inicializar — primero intenta Monday.com, luego Excel, luego manual
+cargarDesdeMondayAPI();
 </script>
 </body>
 </html>
