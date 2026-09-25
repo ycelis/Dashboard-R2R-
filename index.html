@@ -15,19 +15,8 @@ body{background:#f4f6f9;font-family:-apple-system,"Segoe UI",system-ui,sans-seri
 .header p{font-size:12px;color:#a8c4e0;margin-top:2px}
 .header-right{font-size:12px;color:#a8c4e0;text-align:right}
 
-/* BARRA DE CARGA EXCEL */
-.upload-bar{background:white;padding:14px 18px;border-radius:10px;border:2px dashed #d0d7de;margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.upload-bar.drag-over{border-color:#3b82d4;background:#f0f6ff}
-.upload-info{flex:1;min-width:200px}
-.upload-info strong{font-size:13px;color:#1f2328}
-.upload-info p{font-size:11px;color:#57606a;margin-top:2px}
 .file-status{font-size:12px;padding:6px 12px;border-radius:6px;background:#f0fff4;color:#1a7a35;border:1px solid #b7e4c7;display:none}
 .file-status.error{background:#fff5f5;color:#b02a37;border-color:#f5c2c7}
-.btn-excel{background:#217346;color:white;border:none;padding:9px 18px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:6px}
-.btn-excel:hover{background:#1a5c38}
-.btn-template{background:white;color:#217346;border:1px solid #217346;padding:9px 18px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:6px}
-.btn-template:hover{background:#f0fff4}
-#file-input{display:none}
 
 .filters{background:white;padding:12px 16px;border-radius:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px;border:1px solid #e5e7eb}
 .fg{display:flex;flex-direction:column;gap:3px}
@@ -76,24 +65,25 @@ select:focus{outline:2px solid #3b82d4;border-color:#3b82d4;background:white}
 .tbl-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px}
 .tbl-hdr h3{font-size:13px;font-weight:700}
 .res-cnt{font-size:11px;color:#57606a}
-table{width:100%;border-collapse:collapse;font-size:12px}
+/* table-layout:fixed + colgroup controlan los anchos; overflow-x:auto en .table-container maneja pantallas pequeñas */
+table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
 thead{background:#003366;color:white}
-th{padding:9px 10px;text-align:left;font-size:11px;font-weight:600;white-space:nowrap}
-td{padding:9px 10px;border-bottom:1px solid #f0f2f5;vertical-align:middle}
+th{padding:7px 8px;text-align:left;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+td{padding:7px 8px;border-bottom:1px solid #f0f2f5;vertical-align:middle;overflow:hidden}
 tbody tr:hover{background:#f7f8fa}
 tbody tr:last-child td{border-bottom:none}
-.act-name{max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:none}
-.com-input{width:100%;min-width:160px;padding:4px 8px;border:1px solid transparent;border-radius:6px;font-size:11px;font-family:inherit;color:#1f2328;background:transparent;resize:none;line-height:1.5;overflow:hidden;height:28px;transition:border-color .15s,background .15s}
+.act-name{width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:none;display:block}
+.com-input{width:100%;padding:4px 6px;border:1px solid transparent;border-radius:6px;font-size:11px;font-family:inherit;color:#1f2328;background:transparent;resize:none;line-height:1.5;overflow:hidden;height:28px;transition:border-color .15s,background .15s;box-sizing:border-box}
 .com-input:hover{border-color:#d0d7de;background:#f7f8fa}
 .com-input:focus{outline:none;border-color:#3b82d4;background:#fff;height:auto;min-height:28px}
 .com-input::placeholder{color:#adb5bd}
-.est-select{border:none;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;text-align:center;min-width:110px}
+.est-select{border:none;border-radius:20px;padding:3px 6px;font-size:11px;font-weight:700;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;text-align:center;width:100%;box-sizing:border-box}
 .est-select.s-comp{background:#28a745;color:white}
 .est-select.s-proc{background:#ffc107;color:#333}
 .est-select.s-ns{background:#dc3545;color:white}
 .est-select.s-na{background:#6c757d;color:white}
 .est-select:focus{box-shadow:0 0 0 2px rgba(59,130,212,.4)}
-.tipo-select{border:none;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;text-align:center;min-width:110px}
+.tipo-select{border:none;border-radius:20px;padding:3px 6px;font-size:11px;font-weight:700;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;text-align:center;width:100%;box-sizing:border-box}
 .tipo-select.t-cierre{background:#0d6efd;color:white}
 .tipo-select.t-poscierre{background:#6f42c1;color:white}
 .tipo-select.t-none{background:#e5e7eb;color:#57606a}
@@ -139,12 +129,6 @@ tbody tr:last-child td{border-bottom:none}
 .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .svg-tip{position:fixed;background:#1f2328;color:white;padding:5px 10px;border-radius:6px;font-size:11px;pointer-events:none;display:none;z-index:9999;white-space:nowrap;line-height:1.4}
 
-/* COLUMNAS ESPERADAS */
-.col-guide{background:#f7f8fa;border:1px solid #e5e7eb;border-radius:8px;padding:12px 16px;margin-top:10px;font-size:11px;color:#57606a}
-.col-guide strong{color:#1f2328}
-.col-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-.chip{background:#e8f0fe;color:#3b82d4;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
-
 footer{margin-top:28px;padding-top:12px;border-top:1px solid #e5e7eb;text-align:center;font-size:11px;color:#8c959f}
 .btn-lang{background:transparent;color:white;border:1px solid rgba(255,255,255,.4);padding:6px 14px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:700;letter-spacing:.5px;display:flex;align-items:center;gap:6px;transition:background .15s,border-color .15s}
 .btn-lang:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.7)}
@@ -168,40 +152,12 @@ footer{margin-top:28px;padding-top:12px;border-top:1px solid #e5e7eb;text-align:
 </div>
 
 <!-- ZONA DE CARGA EXCEL -->
-<div class="upload-bar" id="drop-zone">
-  <div class="upload-info">
-    <strong data-i18n="upload_title">Datos del dashboard</strong>
-    <p id="upload-desc-auto" style="font-size:11px;color:#57606a;margin-top:2px">
-      ⏳ Cargando datos desde <code>data/cierre.xlsx</code>…
-    </p>
-    <p data-i18n="upload_desc" id="upload-desc-manual" style="display:none">
-      Carga un archivo <strong>.xlsx</strong> de forma manual para previsualizar datos localmente. Arrastra el archivo aquí o usa el botón.
-    </p>
-    <div class="col-guide">
-      <strong data-i18n="cols_required">Columnas requeridas en el Excel:</strong>
-      <div class="col-chips">
-        <span class="chip">Name</span>
-        <span class="chip">Dia</span>
-        <span class="chip">Operación</span>
-        <span class="chip">Estatus Cierre</span>
-        <span class="chip">Responsable</span>
-        <span class="chip">Areas</span>
-        <span class="chip">PAISES</span>
-      </div>
-    </div>
-  </div>
-  <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
-    <input type="file" id="file-input" accept=".xlsx,.xls">
-    <button class="btn-excel" id="btn-cargar">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      <span data-i18n="btn_upload">Cargar Excel manual</span>
-    </button>
-    <button class="btn-template" id="btn-template">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      <span data-i18n="btn_template">Descargar Plantilla</span>
-    </button>
-    <span class="file-status" id="file-status"></span>
-  </div>
+<div style="background:white;padding:10px 18px;border-radius:10px;border:1px solid #e5e7eb;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+  <span style="font-size:13px;font-weight:600;color:#1f2328">🔗 Fuente de datos:</span>
+  <span id="upload-desc-auto" style="font-size:12px;color:#57606a">⏳ Conectando con Monday.com…</span>
+  <span class="file-status" id="file-status"></span>
+  <input type="file" id="file-input" accept=".xlsx,.xls" style="display:none">
+  <p id="upload-desc-manual" style="display:none;font-size:11px;color:#57606a;margin:0"></p>
 </div>
 
 <!-- FILTROS -->
@@ -306,6 +262,19 @@ footer{margin-top:28px;padding-top:12px;border-top:1px solid #e5e7eb;text-align:
     <span class="res-cnt" id="res-cnt"></span>
   </div>
   <table>
+    <!-- anchos fijos: suma ~1160px mínimo; la tabla hace scroll horizontal en pantallas pequeñas -->
+    <colgroup>
+      <col style="width:34px">        <!-- # -->
+      <col style="width:22%">         <!-- Actividad -->
+      <col style="width:40px">        <!-- Día -->
+      <col style="width:72px">        <!-- Operación -->
+      <col style="width:13%">         <!-- Área -->
+      <col style="width:10%">         <!-- Responsable -->
+      <col style="width:8%">          <!-- Países -->
+      <col style="width:100px">       <!-- Estado -->
+      <col style="width:100px">       <!-- Estatus Entregable -->
+      <col>                           <!-- Comentarios: toma el resto -->
+    </colgroup>
     <thead>
       <tr><th>#</th><th data-i18n="th_act">Actividad</th><th data-i18n="th_dia">Día</th><th data-i18n="th_op">Operación</th><th data-i18n="th_area">Área</th><th data-i18n="th_resp">Responsable</th><th data-i18n="th_pais">Países</th><th data-i18n="th_est">Estado</th><th data-i18n="th_tipo">Estatus Entregable</th><th data-i18n="th_com">Comentarios</th></tr>
     </thead>
@@ -330,11 +299,6 @@ const I18N = {
   es: {
     title:"Dashboard Cierre Contable R2R",
     subtitle:"Seguimiento de actividades — México y SCAC",
-    upload_title:"Actualizar datos desde Excel",
-    upload_desc:"Carga tu archivo <strong>.xlsx</strong> cada mes para refrescar el dashboard automáticamente. Arrastra el archivo aquí o usa el botón.",
-    cols_required:"Columnas requeridas en el Excel:",
-    btn_upload:"Cargar Excel",
-    btn_template:"Descargar Plantilla",
     f_op:"Operación", f_op_all:"Todas las Operaciones",
     f_area:"Área",    f_area_all:"Todas las Áreas",
     f_resp:"Responsable", f_resp_all:"Todos los Responsables",
@@ -380,11 +344,6 @@ const I18N = {
   en: {
     title:"R2R Accounting Close Dashboard",
     subtitle:"Activity tracking — Mexico & SCAC",
-    upload_title:"Update data from Excel",
-    upload_desc:"Upload your <strong>.xlsx</strong> file each month to automatically refresh the dashboard. Drag the file here or use the button.",
-    cols_required:"Required Excel columns:",
-    btn_upload:"Upload Excel",
-    btn_template:"Download Template",
     f_op:"Operation", f_op_all:"All Operations",
     f_area:"Area",     f_area_all:"All Areas",
     f_resp:"Owner",    f_resp_all:"All Owners",
@@ -782,6 +741,34 @@ const BADGE     = {"COMPLETED":"b-comp","IN PROCESS":"b-proc","NOT STARTED":"b-n
 const SEL_CLASS = {"COMPLETED":"s-comp","IN PROCESS":"s-proc","NOT STARTED":"s-ns"};
 function badge(e){ return `<span class="badge ${BADGE[e]||'b-na'}">${ELABELS(e)||e}</span>`; }
 
+// ── IDs EXACTOS DE COLUMNAS EN MONDAY (board 18432754378) ────────────────────
+const MON_COL = {
+  dia:    "numeric_mm7harfk",
+  op:     "color_mm7hebrq",
+  est:    "color_mm7hb2y8",   // recreada con 3 labels: COMPLETED(0) IN PROCESS(1) NOT STARTED(2)
+  resp:   "color_mm7hqeq0",
+  area:   "color_mm7hyq20",
+  pais:   "color_mm7hvr12",
+  com:    "text_mm7httv",
+  tipo:   "color_mm7h49bw"    // nueva columna: Cierre(0) Pos-Cierre(1)
+};
+// Labels de Monday → índice (status columns)
+const MON_EST_IDX  = {"COMPLETED": 0, "IN PROCESS": 1, "NOT STARTED": 2};
+const MON_TIPO_IDX = {"cierre": 0, "poscierre": 1, "": 5};
+const MON_OP_IDX   = {"SCAC": 0, "MEXICO": 1};
+const MON_RESP_IDX = {"Luis Forero": 0, "John Pulido": 1, "Ivonne Hernandez": 2};
+const MON_AREA_IDX = {
+  "Activos Fijos SCAC": 0, "Información Financiera SCAC": 1, "Tesoreria SCAC": 2,
+  "Consolidacion SCAC": 8, "Activos Fijos Mexico": 7, "Consolidacion Mexico": 3,
+  "Informacion Financiera Mexico": 4, "Tesoreria Mexico": 6
+};
+const MON_PAIS_IDX = {
+  "Colombia": 0, "Mexico": 1, "Panama": 2, "Haiti": 3, "Caribe": 4,
+  "Peru": 6, "Nicaragua": 7, "Puerto Rico": 8, "Sounthington": 9,
+  "Jamaica": 10, "Bahamas": 11
+};
+
+// Selects editables para cada campo
 function estSelect(dataIdx, currentEst) {
   const opts = ["COMPLETED","IN PROCESS","NOT STARTED"]
     .map(v => `<option value="${v}"${v===currentEst?" selected":""}>${ELABELS(v)||v}</option>`)
@@ -789,6 +776,30 @@ function estSelect(dataIdx, currentEst) {
   const cls = SEL_CLASS[currentEst] || "s-na";
   return `<select class="est-select ${cls}" data-idx="${dataIdx}" onchange="cambiarEstado(this)">${opts}</select>`;
 }
+
+function opSelect(dataIdx, currentOp) {
+  const opts = ["SCAC","MEXICO"].map(v => `<option value="${v}"${v===currentOp?" selected":""}>${v}</option>`).join("");
+  return `<select class="est-select" style="background:#e8f0fe;color:#1a56a0;border-radius:20px;border:none;min-width:90px" data-idx="${dataIdx}" onchange="cambiarOp(this)">${opts}</select>`;
+}
+
+function respSelect(dataIdx, currentResp) {
+  const resps = Object.keys(MON_RESP_IDX);
+  const opts = resps.map(v => `<option value="${v}"${v===currentResp?" selected":""}>${v}</option>`).join("");
+  return `<select class="est-select" style="background:#fdf4ff;color:#6b21a8;border-radius:20px;border:none;min-width:120px" data-idx="${dataIdx}" onchange="cambiarResp(this)">${opts}</select>`;
+}
+
+function areaSelect(dataIdx, currentArea) {
+  const areas = Object.keys(MON_AREA_IDX);
+  const opts = areas.map(v => `<option value="${v}"${v===currentArea?" selected":""}>${v}</option>`).join("");
+  return `<select class="est-select" style="background:#f0fdf4;color:#166534;border-radius:20px;border:none;min-width:150px" data-idx="${dataIdx}" onchange="cambiarArea(this)">${opts}</select>`;
+}
+
+function paisSelect(dataIdx, currentPais) {
+  const paises = Object.keys(MON_PAIS_IDX);
+  const opts = paises.map(v => `<option value="${v}"${v===currentPais?" selected":""}>${v}</option>`).join("");
+  return `<select class="est-select" style="background:#fff7ed;color:#9a3412;border-radius:20px;border:none;min-width:100px" data-idx="${dataIdx}" onchange="cambiarPais(this)">${opts}</select>`;
+}
+
 const TIPO_CLASS = {"cierre":"t-cierre","poscierre":"t-poscierre","":"t-none"};
 function normTipo(v) {
   if (!v) return "";
@@ -869,16 +880,18 @@ function render() {
   const tbody=document.getElementById("tbody");
   tbody.innerHTML = !vis.length
     ? `<tr><td colspan="10" style="text-align:center;color:#57606a;padding:18px">${t("tbl_no_results")}</td></tr>`
-    : vis.map((d,i)=>`<tr>
+    : vis.map((d,i)=>{ const di=DATA.indexOf(d); return `<tr>
         <td style="color:#57606a;font-size:11px">${i+1}</td>
         <td class="act-name" title="${d.n}"><strong>${d.n.charAt(0).toUpperCase()+d.n.slice(1).toLowerCase()}</strong></td>
         <td style="color:#57606a">${d.dia??'—'}</td>
-        <td>${d.op}</td><td>${d.area}</td><td>${d.resp}</td>
-        <td style="font-size:11px;color:#57606a;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${d.pais}">${d.pais}</td>
-        <td>${estSelect(DATA.indexOf(d), d.est)}</td>
-        <td>${tipoSelect(DATA.indexOf(d), d.tipo)}</td>
-        <td style="max-width:200px"><textarea class="com-input" data-idx="${DATA.indexOf(d)}" rows="1" placeholder="—" onchange="guardarComentario(this)" oninput="autoResize(this)">${d.com||''}</textarea></td>
-      </tr>`).join("");
+        <td>${opSelect(di, d.op)}</td>
+        <td>${areaSelect(di, d.area)}</td>
+        <td>${respSelect(di, d.resp)}</td>
+        <td>${paisSelect(di, d.pais)}</td>
+        <td>${estSelect(di, d.est)}</td>
+        <td>${tipoSelect(di, d.tipo)}</td>
+        <td style="max-width:200px"><textarea class="com-input" data-idx="${di}" rows="1" placeholder="—" onchange="guardarComentario(this)" oninput="autoResize(this)">${d.com||''}</textarea></td>
+      </tr>`; }).join("");
 
   const locale = LANG==="es" ? "es-MX" : "en-US";
   const ahora=new Date();
@@ -903,36 +916,14 @@ function render() {
 }
 
 // ── ESCRITURA EN MONDAY.COM ───────────────────────────────────────────────────
-// Convierte el valor interno del dashboard al label que Monday espera para status
-function estToMondayLabel(est) {
-  if (est === "COMPLETED")  return "Completado";
-  if (est === "IN PROCESS") return "En Proceso";
-  return "No Iniciado";
-}
 
-// Busca el columnId en el item por variantes del título
-function resolveColId(item, ...titles) {
-  if (!item.colIds) return null;
-  for (const title of titles) {
-    // exacto
-    if (item.colIds[title]) return item.colIds[title];
-    // parcial
-    const found = Object.keys(item.colIds).find(k => k.toLowerCase().includes(title.toLowerCase()));
-    if (found) return item.colIds[found];
-  }
-  return null;
-}
-
-// Envía una mutación change_column_value a Monday y muestra feedback en el select/textarea
-async function updateMondayColumn(itemId, boardId, columnId, value, feedbackEl) {
-  if (!itemId || !columnId) {
-    console.warn("updateMondayColumn: falta itemId o columnId", { itemId, columnId });
-    return;
-  }
+// Envía una mutación change_column_value a Monday con feedback visual en el control
+async function writeMondayCell(mondayId, columnId, value, feedbackEl) {
+  if (!mondayId || !columnId) return;
   const mutation = `mutation {
     change_column_value(
-      item_id: ${itemId},
-      board_id: ${boardId},
+      item_id: ${mondayId},
+      board_id: ${MONDAY_BOARD_ID},
       column_id: "${columnId}",
       value: ${JSON.stringify(JSON.stringify(value))}
     ) { id }
@@ -941,11 +932,7 @@ async function updateMondayColumn(itemId, boardId, columnId, value, feedbackEl) 
     if (feedbackEl) feedbackEl.style.outline = "2px solid #f59e0b";
     const res = await fetch(MONDAY_API_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": MONDAY_TOKEN,
-        "API-Version": "2024-01"
-      },
+      headers: { "Content-Type": "application/json", "Authorization": MONDAY_TOKEN, "API-Version": "2024-01" },
       body: JSON.stringify({ query: mutation })
     });
     const json = await res.json();
@@ -957,16 +944,13 @@ async function updateMondayColumn(itemId, boardId, columnId, value, feedbackEl) 
   }
 }
 
+// Comentarios → columna text (valor plano)
 function guardarComentario(ta) {
   const idx = parseInt(ta.dataset.idx);
   if (isNaN(idx) || !DATA[idx]) return;
   DATA[idx].com = ta.value.trim();
-  // Escribir en Monday si tenemos los IDs
   const item = DATA[idx];
-  const colId = resolveColId(item, "Comentarios","Comentario","Comments","Comment","COMENTARIOS","comentario","Notes","notes");
-  if (item.mondayId && colId) {
-    updateMondayColumn(item.mondayId, MONDAY_BOARD_ID, colId, DATA[idx].com, ta);
-  }
+  if (item.mondayId) writeMondayCell(item.mondayId, MON_COL.com, DATA[idx].com, ta);
 }
 
 function autoResize(ta) {
@@ -974,49 +958,68 @@ function autoResize(ta) {
   ta.style.height = ta.scrollHeight + "px";
 }
 
+// Estatus Entregable/Tipo → columna color_mm7h49bw (Cierre=0, Pos-Cierre=1)
 function cambiarTipo(sel) {
   const idx = parseInt(sel.dataset.idx);
   if (isNaN(idx) || !DATA[idx]) return;
   DATA[idx].tipo = sel.value;
   sel.className = "tipo-select " + (TIPO_CLASS[sel.value] || "t-none");
-  // Escribir en Monday si tenemos los IDs
   const item = DATA[idx];
-  const colId = resolveColId(item, "Estatus Entregable","Tipo","TIPO","Deliverable Status","Cierre_Tipo","entregable");
-  if (item.mondayId && colId) {
-    updateMondayColumn(item.mondayId, MONDAY_BOARD_ID, colId, sel.value, sel);
-  }
+  const monIdx = MON_TIPO_IDX[sel.value] ?? 5;
+  if (item.mondayId) writeMondayCell(item.mondayId, MON_COL.tipo, { index: monIdx }, sel);
 }
 
+// Estatus Cierre → status column con índice numérico
 function cambiarEstado(sel) {
   const idx = parseInt(sel.dataset.idx);
   if (isNaN(idx) || !DATA[idx]) return;
   DATA[idx].est = sel.value;
-  // actualizar color del select sin re-renderizar toda la tabla
   sel.className = "est-select " + (SEL_CLASS[sel.value] || "s-na");
-  // recalcular KPIs, barra de progreso, gráficas y alertas sin tocar el tbody
   renderStats();
-  // Escribir en Monday — status columns usan formato JSON especial {label:"..."}
   const item = DATA[idx];
-  const colId = resolveColId(item, "Estatus Cierre","Estatus","Estado","Status","Estatus_Cierre","estado");
-  if (item.mondayId && colId) {
-    // Para columnas de tipo Status, Monday espera value = JSON.stringify({label:"..."})
-    const mutation = `mutation {
-      change_column_value(
-        item_id: ${item.mondayId},
-        board_id: ${MONDAY_BOARD_ID},
-        column_id: "${colId}",
-        value: ${JSON.stringify(JSON.stringify({ label: estToMondayLabel(sel.value) }))}
-      ) { id }
-    }`;
-    fetch(MONDAY_API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": MONDAY_TOKEN, "API-Version": "2024-01" },
-      body: JSON.stringify({ query: mutation })
-    }).then(r => r.json()).then(json => {
-      if (json.errors && json.errors.length) { sel.style.outline="2px solid #dc3545"; setTimeout(()=>{sel.style.outline=""},2000); console.error("Monday status error:", json.errors[0].message); }
-      else { sel.style.outline="2px solid #28a745"; setTimeout(()=>{sel.style.outline=""},1500); }
-    }).catch(e => { console.error(e); sel.style.outline="2px solid #dc3545"; setTimeout(()=>{sel.style.outline=""},2000); });
-  }
+  const monIdx = MON_EST_IDX[sel.value] ?? 5;
+  if (item.mondayId) writeMondayCell(item.mondayId, MON_COL.est, { index: monIdx }, sel);
+}
+
+// Operación → status column
+function cambiarOp(sel) {
+  const idx = parseInt(sel.dataset.idx);
+  if (isNaN(idx) || !DATA[idx]) return;
+  DATA[idx].op = sel.value;
+  const item = DATA[idx];
+  const monIdx = MON_OP_IDX[sel.value] ?? 5;
+  if (item.mondayId) writeMondayCell(item.mondayId, MON_COL.op, { index: monIdx }, sel);
+}
+
+// Responsable → status column
+function cambiarResp(sel) {
+  const idx = parseInt(sel.dataset.idx);
+  if (isNaN(idx) || !DATA[idx]) return;
+  DATA[idx].resp = sel.value;
+  const item = DATA[idx];
+  const monIdx = MON_RESP_IDX[sel.value] ?? 5;
+  if (item.mondayId) writeMondayCell(item.mondayId, MON_COL.resp, { index: monIdx }, sel);
+}
+
+// Área → status column
+function cambiarArea(sel) {
+  const idx = parseInt(sel.dataset.idx);
+  if (isNaN(idx) || !DATA[idx]) return;
+  DATA[idx].area = sel.value;
+  renderStats();
+  const item = DATA[idx];
+  const monIdx = MON_AREA_IDX[sel.value] ?? 5;
+  if (item.mondayId) writeMondayCell(item.mondayId, MON_COL.area, { index: monIdx }, sel);
+}
+
+// País → status column
+function cambiarPais(sel) {
+  const idx = parseInt(sel.dataset.idx);
+  if (isNaN(idx) || !DATA[idx]) return;
+  DATA[idx].pais = sel.value;
+  const item = DATA[idx];
+  const monIdx = MON_PAIS_IDX[sel.value] ?? 5;
+  if (item.mondayId) writeMondayCell(item.mondayId, MON_COL.pais, { index: monIdx }, sel);
 }
 
 function renderStats() {
@@ -1363,18 +1366,10 @@ function renderGraficas(vis){
 }
 
 // ── EVENTOS ───────────────────────────────────────────────────────────────────
-document.getElementById("btn-cargar").addEventListener("click", ()=>document.getElementById("file-input").click());
 document.getElementById("file-input").addEventListener("change", e=>{
   if(e.target.files[0]) procesarExcel(e.target.files[0]);
-  e.target.value=""; // permitir recargar mismo archivo
+  e.target.value="";
 });
-document.getElementById("btn-template").addEventListener("click", descargarPlantilla);
-
-// Arrastrar y soltar
-const dz = document.getElementById("drop-zone");
-dz.addEventListener("dragover", e=>{ e.preventDefault(); dz.classList.add("drag-over"); });
-dz.addEventListener("dragleave", ()=>dz.classList.remove("drag-over"));
-dz.addEventListener("drop", e=>{ e.preventDefault(); dz.classList.remove("drag-over"); if(e.dataTransfer.files[0]) procesarExcel(e.dataTransfer.files[0]); });
 
 ["f-op","f-area","f-resp","f-estado","f-pais","f-dia"].forEach(id=>{
   document.getElementById(id).addEventListener("change", render);
@@ -1401,9 +1396,9 @@ const MONDAY_API_URL  = "https://api.monday.com/v2";
 function normalizarEstadoMonday(label) {
   if (!label) return "NOT STARTED";
   const l = label.toUpperCase();
-  if (l === "COMPLETADO" || l === "COMPLETED" || l === "DONE" || l === "FINALIZADO" || l === "CERRADO") return "COMPLETED";
-  if (l === "EN PROCESO" || l === "EN PROGRESO" || l === "IN PROCESS" || l === "WORKING ON IT" || l === "EN COURS") return "IN PROCESS";
-  if (l === "BLOQUEADO" || l === "STUCK") return "NOT STARTED"; // se muestra aparte pero reutiliza slot
+  if (l === "COMPLETED" || l === "COMPLETADO" || l === "DONE" || l === "FINALIZADO") return "COMPLETED";
+  if (l === "IN PROCESS" || l === "EN PROCESO" || l === "EN PROGRESO" || l === "WORKING ON IT") return "IN PROCESS";
+  if (l === "NOT STARTED" || l === "NO INICIADO" || l === "NOT APPLICABLE" || l === "BLOQUEADO" || l === "STUCK") return "NOT STARTED";
   return "NOT STARTED";
 }
 
