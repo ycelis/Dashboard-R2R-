@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Cierre Contable R2R</title>
+<title> Centro de Operaciones de Cierre Financiero – RTR México y SCAC </title>
 <!-- SheetJS: leer archivos Excel en el navegador sin servidor -->
 <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 <style>
@@ -66,24 +66,26 @@ select:focus{outline:2px solid #3b82d4;border-color:#3b82d4;background:white}
 .tbl-hdr h3{font-size:13px;font-weight:700}
 .res-cnt{font-size:11px;color:#57606a}
 /* table-layout:fixed + colgroup controlan los anchos; overflow-x:auto en .table-container maneja pantallas pequeñas */
-table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;min-width:960px}
 thead{background:#003366;color:white}
-th{padding:7px 8px;text-align:left;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-td{padding:7px 8px;border-bottom:1px solid #f0f2f5;vertical-align:middle;overflow:hidden}
+th{padding:7px 8px;text-align:center;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+td{padding:7px 8px;border-bottom:1px solid #f0f2f5;vertical-align:middle;overflow:hidden;text-align:center}
+td.td-est,td.td-tipo{overflow:visible;white-space:nowrap}
+td.td-act,td.td-area{overflow:visible;white-space:normal;word-break:break-word;text-align:center}
 tbody tr:hover{background:#f7f8fa}
 tbody tr:last-child td{border-bottom:none}
-.act-name{width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:none;display:block}
+.act-name{width:100%;white-space:normal;word-break:break-word;text-transform:none;display:block;text-align:center}
 .com-input{width:100%;padding:4px 6px;border:1px solid transparent;border-radius:6px;font-size:11px;font-family:inherit;color:#1f2328;background:transparent;resize:none;line-height:1.5;overflow:hidden;height:28px;transition:border-color .15s,background .15s;box-sizing:border-box}
 .com-input:hover{border-color:#d0d7de;background:#f7f8fa}
 .com-input:focus{outline:none;border-color:#3b82d4;background:#fff;height:auto;min-height:28px}
 .com-input::placeholder{color:#adb5bd}
-.est-select{border:none;border-radius:20px;padding:3px 6px;font-size:11px;font-weight:700;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;text-align:center;width:100%;box-sizing:border-box}
+.est-select{border:none;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;text-align:center;width:100%;min-width:110px;box-sizing:border-box;white-space:nowrap}
 .est-select.s-comp{background:#28a745;color:white}
 .est-select.s-proc{background:#ffc107;color:#333}
 .est-select.s-ns{background:#dc3545;color:white}
 .est-select.s-na{background:#6c757d;color:white}
 .est-select:focus{box-shadow:0 0 0 2px rgba(59,130,212,.4)}
-.tipo-select{border:none;border-radius:20px;padding:3px 6px;font-size:11px;font-weight:700;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;text-align:center;width:100%;box-sizing:border-box}
+.tipo-select{border:none;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;text-align:center;width:100%;min-width:110px;box-sizing:border-box;white-space:nowrap}
 .tipo-select.t-cierre{background:#0d6efd;color:white}
 .tipo-select.t-poscierre{background:#6f42c1;color:white}
 .tipo-select.t-none{background:#e5e7eb;color:#57606a}
@@ -140,8 +142,8 @@ footer{margin-top:28px;padding-top:12px;border-top:1px solid #e5e7eb;text-align:
 <!-- ENCABEZADO -->
 <div class="header">
   <div>
-    <h1 data-i18n="title">Dashboard Cierre Contable R2R</h1>
-    <p data-i18n="subtitle">Seguimiento de actividades — México y SCAC</p>
+    <h1 data-i18n="title">Centro de Operaciones de Cierre Financiero – RTR México y SCAC</h1>
+    <p data-i18n="subtitle">Monitoreo en tiempo real del progreso, entregables y bloqueantes del cierre contable</p>
   </div>
   <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
     <div class="header-right" id="header-stats"></div>
@@ -194,6 +196,12 @@ footer{margin-top:28px;padding-top:12px;border-top:1px solid #e5e7eb;text-align:
   <div class="card c-ns"><div class="kpi-num" id="k-ns">—</div><div class="kpi-lbl" data-i18n="kpi_ns">No Iniciadas</div><div class="kpi-pct" id="k-ns-p"></div></div>
 </div>
 
+<!-- Comentarios globales por líder — ancho completo -->
+<div class="leader-comments" id="leader-comments-panel" style="margin-bottom:16px">
+  <h3 data-i18n="chart_leader_comments">&#128172; Comentarios / Bloqueantes por Líder</h3>
+  <div class="leader-comments-grid" id="leader-comments-grid"></div>
+</div>
+
 <!-- PROGRESO -->
 <div class="section">
   <h3 data-i18n="sec_avance">Avance General del Cierre</h3>
@@ -240,10 +248,18 @@ footer{margin-top:28px;padding-top:12px;border-top:1px solid #e5e7eb;text-align:
     <div class="legend" id="op-legend"></div>
   </div>
 </div>
-<!-- Comentarios globales por líder — ancho completo -->
-<div class="leader-comments" id="leader-comments-panel" style="margin-bottom:16px">
-  <h3 data-i18n="chart_leader_comments">&#128172; Comentarios / Bloqueantes por Líder</h3>
-  <div class="leader-comments-grid" id="leader-comments-grid"></div>
+<!-- Gráfica por Estatus Entregable (Cierre vs Pos-cierre) -->
+<div class="charts-grid" style="margin-bottom:16px">
+  <div class="chart-box">
+    <h3 data-i18n="chart_tipo_est">Estado por Tipo de Entregable</h3>
+    <div id="chart-tipo-est"></div>
+    <div class="legend" id="tipo-est-legend"></div>
+  </div>
+  <div class="chart-box">
+    <h3 data-i18n="chart_tipo_dist">Distribución Cierre vs Pos-cierre</h3>
+    <div id="chart-tipo-dist"></div>
+    <div class="legend" id="tipo-dist-legend"></div>
+  </div>
 </div>
 <!-- Gráfica por día -->
 <div class="chart-box" style="margin-bottom:16px">
@@ -264,16 +280,16 @@ footer{margin-top:28px;padding-top:12px;border-top:1px solid #e5e7eb;text-align:
   <table>
     <!-- anchos fijos: suma ~1160px mínimo; la tabla hace scroll horizontal en pantallas pequeñas -->
     <colgroup>
-      <col style="width:34px">        <!-- # -->
-      <col style="width:22%">         <!-- Actividad -->
-      <col style="width:40px">        <!-- Día -->
-      <col style="width:72px">        <!-- Operación -->
-      <col style="width:13%">         <!-- Área -->
-      <col style="width:10%">         <!-- Responsable -->
-      <col style="width:8%">          <!-- Países -->
-      <col style="width:100px">       <!-- Estado -->
-      <col style="width:100px">       <!-- Estatus Entregable -->
-      <col>                           <!-- Comentarios: toma el resto -->
+      <col style="width:34px">         <!-- # -->
+      <col style="width:240px">        <!-- Actividad -->
+      <col style="width:40px">         <!-- Día -->
+      <col style="width:82px">         <!-- Operación -->
+      <col style="width:170px">        <!-- Área -->
+      <col style="width:120px">        <!-- Responsable -->
+      <col style="width:110px">        <!-- Países -->
+      <col style="width:130px">        <!-- Estado -->
+      <col style="width:130px">        <!-- Estatus Entregable -->
+      <col>                            <!-- Comentarios: toma el resto -->
     </colgroup>
     <thead>
       <tr><th>#</th><th data-i18n="th_act">Actividad</th><th data-i18n="th_dia">Día</th><th data-i18n="th_op">Operación</th><th data-i18n="th_area">Área</th><th data-i18n="th_resp">Responsable</th><th data-i18n="th_pais">Países</th><th data-i18n="th_est">Estado</th><th data-i18n="th_tipo">Estatus Entregable</th><th data-i18n="th_com">Comentarios</th></tr>
@@ -297,8 +313,8 @@ let LANG = "es";
 
 const I18N = {
   es: {
-    title:"Dashboard Cierre Contable R2R",
-    subtitle:"Seguimiento de actividades — México y SCAC",
+    title:"Centro de Operaciones de Cierre Financiero – RTR México y SCAC",
+    subtitle:"Monitoreo en tiempo real del progreso, entregables y bloqueantes del cierre contable",
     f_op:"Operación", f_op_all:"Todas las Operaciones",
     f_area:"Área",    f_area_all:"Todas las Áreas",
     f_resp:"Responsable", f_resp_all:"Todos los Responsables",
@@ -340,10 +356,12 @@ const I18N = {
     hdr_total:"Total:",hdr_activities:"actividades",hdr_completed:"Completadas",
     sin_datos:"Sin datos.",
     dia_prefix:"Día ",
+    chart_tipo_est:"Estado por Tipo de Entregable",
+    chart_tipo_dist:"Distribución Cierre vs Pos-cierre",
   },
   en: {
-    title:"R2R Accounting Close Dashboard",
-    subtitle:"Activity tracking — Mexico & SCAC",
+    title:"Financial Close Operations Center – RTR Mexico & SCAC",
+    subtitle:"Real-time monitoring of progress, deliverables and blockers for the accounting close",
     f_op:"Operation", f_op_all:"All Operations",
     f_area:"Area",     f_area_all:"All Areas",
     f_resp:"Owner",    f_resp_all:"All Owners",
@@ -385,6 +403,8 @@ const I18N = {
     hdr_total:"Total:",hdr_activities:"activities",hdr_completed:"Completed",
     sin_datos:"No data.",
     dia_prefix:"Day ",
+    chart_tipo_est:"Status by Deliverable Type",
+    chart_tipo_dist:"Close vs Post-close Distribution",
   }
 };
 
@@ -588,6 +608,22 @@ let DATA = [
   {n:"REGISTROS SAP (RECLASIFICACIONES) NICARAGUA",dia:1,op:"SCAC",est:"IN PROCESS",resp:"John Pulido",area:"Tesorería SCAC",pais:"Nicaragua"},
 ];
 
+// Aplicar normTipo a datos por defecto (no tienen campo tipo)
+DATA.forEach(d => { if (!d.tipo) d.tipo = "cierre"; });
+
+// ── NORMALIZACIÓN CENTRALIZADA ────────────────────────────────────────────────
+function normalizarDatos(arr) {
+  arr.forEach(d => {
+    // Normalizar estado
+    const e = (d.est || "").toUpperCase().trim();
+    if (e === "COMPLETED"  || e === "COMPLETADO")                          d.est = "COMPLETED";
+    else if (e === "IN PROCESS" || e === "EN PROCESO" || e === "EN PROGRESO") d.est = "IN PROCESS";
+    else if (e === "NOT STARTED"|| e === "NO INICIADO")                    d.est = "NOT STARTED";
+    // Normalizar tipo entregable usando normTipo()
+    d.tipo = normTipo(d.tipo || "");
+  });
+}
+
 // ── MAPEO DE COLUMNAS EXCEL ───────────────────────────────────────────────────
 // Busca la columna ignorando mayúsculas/espacios extras
 function buscarCol(headers, ...opciones) {
@@ -647,14 +683,7 @@ function procesarExcel(file) {
       }
 
       if (nuevos.length === 0) throw new Error("No se encontraron filas con datos válidos.");
-
-      // Normalizar estados
-      nuevos.forEach(d => {
-        if (d.est === "COMPLETED" || d.est === "COMPLETADO") d.est = "COMPLETED";
-        else if (d.est === "IN PROCESS" || d.est === "EN PROCESO" || d.est === "EN PROGRESO") d.est = "IN PROCESS";
-        else if (d.est === "NOT STARTED" || d.est === "NO INICIADO") d.est = "NOT STARTED";
-      });
-
+      normalizarDatos(nuevos);
       DATA = nuevos;
       reconstruirFiltros();
       render();
@@ -791,13 +820,13 @@ function respSelect(dataIdx, currentResp) {
 function areaSelect(dataIdx, currentArea) {
   const areas = Object.keys(MON_AREA_IDX);
   const opts = areas.map(v => `<option value="${v}"${v===currentArea?" selected":""}>${v}</option>`).join("");
-  return `<select class="est-select" style="background:#f0fdf4;color:#166534;border-radius:20px;border:none;min-width:150px" data-idx="${dataIdx}" onchange="cambiarArea(this)">${opts}</select>`;
+  return `<select class="est-select" style="background:#f0fdf4;color:#166534;border-radius:20px;border:none;width:100%;white-space:normal" data-idx="${dataIdx}" onchange="cambiarArea(this)">${opts}</select>`;
 }
 
 function paisSelect(dataIdx, currentPais) {
   const paises = Object.keys(MON_PAIS_IDX);
   const opts = paises.map(v => `<option value="${v}"${v===currentPais?" selected":""}>${v}</option>`).join("");
-  return `<select class="est-select" style="background:#fff7ed;color:#9a3412;border-radius:20px;border:none;min-width:100px" data-idx="${dataIdx}" onchange="cambiarPais(this)">${opts}</select>`;
+  return `<select class="est-select" style="background:#fff7ed;color:#9a3412;border-radius:20px;border:none;width:100%;white-space:normal" data-idx="${dataIdx}" onchange="cambiarPais(this)">${opts}</select>`;
 }
 
 const TIPO_CLASS = {"cierre":"t-cierre","poscierre":"t-poscierre","":"t-none"};
@@ -882,15 +911,15 @@ function render() {
     ? `<tr><td colspan="10" style="text-align:center;color:#57606a;padding:18px">${t("tbl_no_results")}</td></tr>`
     : vis.map((d,i)=>{ const di=DATA.indexOf(d); return `<tr>
         <td style="color:#57606a;font-size:11px">${i+1}</td>
-        <td class="act-name" title="${d.n}"><strong>${d.n.charAt(0).toUpperCase()+d.n.slice(1).toLowerCase()}</strong></td>
+        <td class="td-act" title="${d.n}"><span class="act-name"><strong>${d.n.charAt(0).toUpperCase()+d.n.slice(1).toLowerCase()}</strong></span></td>
         <td style="color:#57606a">${d.dia??'—'}</td>
         <td>${opSelect(di, d.op)}</td>
-        <td>${areaSelect(di, d.area)}</td>
+        <td class="td-area">${areaSelect(di, d.area)}</td>
         <td>${respSelect(di, d.resp)}</td>
         <td>${paisSelect(di, d.pais)}</td>
-        <td>${estSelect(di, d.est)}</td>
-        <td>${tipoSelect(di, d.tipo)}</td>
-        <td style="max-width:200px"><textarea class="com-input" data-idx="${di}" rows="1" placeholder="—" onchange="guardarComentario(this)" oninput="autoResize(this)">${d.com||''}</textarea></td>
+        <td class="td-est">${estSelect(di, d.est)}</td>
+        <td class="td-tipo">${tipoSelect(di, d.tipo)}</td>
+        <td><textarea class="com-input" data-idx="${di}" rows="1" placeholder="—" onchange="guardarComentario(this)" oninput="autoResize(this)">${d.com||''}</textarea></td>
       </tr>`; }).join("");
 
   const locale = LANG==="es" ? "es-MX" : "en-US";
@@ -1216,48 +1245,61 @@ function renderRespBars(vis) {
     `<svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}">${bars}</svg>`;
 }
 
-// ── BARRAS POR OPERACIÓN (apiladas) ──────────────────────────────────────────
+// ── BARRAS POR OPERACIÓN (% por estado) ──────────────────────────────────────
 function renderOpBars(vis) {
   const ops = [...new Set(DATA.map(d=>d.op))].sort();
-  const W=400, BAR=30, GAP=18, LEFT=80, RIGHT=60;
-  const H = ops.length*(BAR+GAP) + 20;
-  const maxTot = Math.max(...ops.map(o=>vis.filter(d=>d.op===o).length), 1);
+  const W=420, BAR=36, GAP=24, LEFT=86, RIGHT=52;
+  const H = ops.length*(BAR+GAP) + 30;
   const usableW = W-LEFT-RIGHT;
 
-  let bars="";
+  let svg="";
+
+  // Líneas guía verticales en 25%, 50%, 75%, 100%
+  [25,50,75,100].forEach(g=>{
+    const gx = LEFT + Math.round(g/100*usableW);
+    svg+=`<line x1="${gx}" y1="0" x2="${gx}" y2="${H-16}" stroke="#e5e7eb" stroke-width="1"/>`;
+    svg+=`<text x="${gx}" y="${H-4}" text-anchor="middle" font-size="9" fill="#adb5bd">${g}%</text>`;
+  });
+
   ops.forEach((op,oi)=>{
     const y = 10 + oi*(BAR+GAP);
     const od = vis.filter(d=>d.op===op);
     const tot = od.length;
+    if(!tot) return;
 
-    // fondo gris
-    bars+=`<rect x="${LEFT}" y="${y}" width="${usableW}" height="${BAR}" fill="#e5e7eb" rx="4"/>`;
+    // fondo gris (100%)
+    svg+=`<rect x="${LEFT}" y="${y}" width="${usableW}" height="${BAR}" fill="#f0f2f5" rx="6"/>`;
 
-    // segmentos apilados
+    // segmentos proporcionales al % de cada estado
     let xCursor = LEFT;
     ESTADOS.forEach(est=>{
       const n = od.filter(d=>d.est===est).length;
       if(!n) return;
-      const w = Math.round((n/maxTot)*usableW);
       const pct = Math.round(n/tot*100);
-      bars+=`<rect x="${xCursor}" y="${y}" width="${w}" height="${BAR}" fill="${C[est]}" rx="4" opacity="0.9"
-        data-lbl="${op} — ${ELABELS(est)}: ${n} (${pct}%)"
+      const w = Math.round(pct/100*usableW);
+      svg+=`<rect x="${xCursor}" y="${y}" width="${w}" height="${BAR}" fill="${C[est]}" rx="6" opacity="0.92"
+        data-lbl="${op} · ${ELABELS(est)}: ${n} act. (${pct}%)"
         style="cursor:pointer"
         onmouseenter="showTip(event,this.dataset.lbl)"
         onmousemove="moveTip(event)"
         onmouseleave="hideTip()"
       />`;
+      // etiqueta % dentro del segmento si hay espacio
+      if(w > 26) svg+=`<text x="${xCursor+w/2}" y="${y+BAR/2+4}" text-anchor="middle" font-size="11" font-weight="700" fill="white" pointer-events="none">${pct}%</text>`;
       xCursor += w;
     });
 
-    // etiqueta nombre operación
-    bars+=`<text x="${LEFT-6}" y="${y+BAR/2+4}" text-anchor="end" font-size="12" font-weight="600" fill="#1f2328">${op}</text>`;
-    // total al final
-    bars+=`<text x="${xCursor+5}" y="${y+BAR/2+4}" font-size="11" fill="#57606a">${tot}</text>`;
+    // % completado al final (derecha)
+    const pComp = Math.round((od.filter(d=>d.est==="COMPLETED").length/tot)*100);
+    svg+=`<text x="${LEFT+usableW+6}" y="${y+BAR/2+4}" font-size="11" font-weight="700" fill="#28a745">${pComp}%</text>`;
+    // nombre operación (izquierda)
+    svg+=`<text x="${LEFT-8}" y="${y+BAR/2+4}" text-anchor="end" font-size="12" font-weight="700" fill="#1f2328">${op}</text>`;
+    // total actividades debajo del nombre
+    svg+=`<text x="${LEFT-8}" y="${y+BAR/2+14}" text-anchor="end" font-size="9" fill="#57606a">${tot} act.</text>`;
   });
 
   document.getElementById("chart-op").innerHTML=
-    `<svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}">${bars}</svg>`;
+    `<svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}">${svg}</svg>`;
 
   document.getElementById("op-legend").innerHTML = ESTADOS.map(e=>
     `<div class="legend-item"><div class="legend-dot" style="background:${C[e]}"></div>${ELABELS(e)}</div>`
@@ -1356,11 +1398,106 @@ function renderLeaderComments() {
   });
 }
 
+// ── BARRAS ESTADO POR TIPO DE ENTREGABLE ─────────────────────────────────────
+function renderTipoEstBars(vis) {
+  const TIPOS = ["cierre","poscierre"];
+  const TIPO_LABEL = {"cierre": t("tipo_cierre"), "poscierre": t("tipo_poscierre")};
+  const TIPO_COLOR = {"cierre":"#0d6efd","poscierre":"#6f42c1"};
+  const W=400, BAR=32, GAP=20, LEFT=110, RIGHT=50;
+  const H = TIPOS.length*(BAR+GAP) + 20;
+  const maxTot = Math.max(...TIPOS.map(tp=>vis.filter(d=>d.tipo===tp).length), 1);
+  const usableW = W-LEFT-RIGHT;
+
+  let bars="";
+  TIPOS.forEach((tp,ti)=>{
+    const y = 10 + ti*(BAR+GAP);
+    const td = vis.filter(d=>d.tipo===tp);
+    const tot = td.length;
+    bars+=`<rect x="${LEFT}" y="${y}" width="${usableW}" height="${BAR}" fill="#e5e7eb" rx="4"/>`;
+    let xCursor = LEFT;
+    ESTADOS.forEach(est=>{
+      const n = td.filter(d=>d.est===est).length;
+      if(!n) return;
+      const w = Math.round((n/maxTot)*usableW);
+      const pct = Math.round(n/tot*100);
+      bars+=`<rect x="${xCursor}" y="${y}" width="${w}" height="${BAR}" fill="${C[est]}" rx="4" opacity="0.9"
+        data-lbl="${TIPO_LABEL[tp]} — ${ELABELS(est)}: ${n} (${pct}%)"
+        style="cursor:pointer"
+        onmouseenter="showTip(event,this.dataset.lbl)"
+        onmousemove="moveTip(event)"
+        onmouseleave="hideTip()"
+      />`;
+      if(w>22) bars+=`<text x="${xCursor+w/2}" y="${y+BAR/2+4}" text-anchor="middle" font-size="10" fill="white" pointer-events="none">${n}</text>`;
+      xCursor += w;
+    });
+    bars+=`<text x="${LEFT-8}" y="${y+BAR/2+4}" text-anchor="end" font-size="12" font-weight="700" fill="${TIPO_COLOR[tp]}">${TIPO_LABEL[tp]}</text>`;
+    bars+=`<text x="${xCursor+5}" y="${y+BAR/2+4}" font-size="11" fill="#57606a">${tot}</text>`;
+  });
+
+  const el = document.getElementById("chart-tipo-est");
+  if(el) el.innerHTML=`<svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}">${bars}</svg>`;
+  const leg = document.getElementById("tipo-est-legend");
+  if(leg) leg.innerHTML = ESTADOS.map(e=>
+    `<div class="legend-item"><div class="legend-dot" style="background:${C[e]}"></div>${ELABELS(e)}</div>`
+  ).join("");
+}
+
+// ── DONA DISTRIBUCIÓN CIERRE VS POS-CIERRE ────────────────────────────────────
+function renderTipoDist(vis) {
+  const TIPOS = ["cierre","poscierre"];
+  const TIPO_LABEL = {"cierre": t("tipo_cierre"), "poscierre": t("tipo_poscierre")};
+  const TIPO_COLOR = {"cierre":"#0d6efd","poscierre":"#6f42c1"};
+  const R=80, CX=110, CY=100, W=320, H=200;
+  const total = vis.filter(d=>TIPOS.includes(d.tipo)).length;
+
+  if(!total){
+    const el=document.getElementById("chart-tipo-dist");
+    if(el) el.innerHTML=`<p style='font-size:12px;color:#57606a;padding:8px 0'>${t("sin_datos")}</p>`;
+    return;
+  }
+
+  let slices=""; let startAngle=-Math.PI/2;
+  TIPOS.forEach(tp=>{
+    const n = vis.filter(d=>d.tipo===tp).length;
+    if(!n) return;
+    const angle = (n/total)*2*Math.PI;
+    const x1=CX+R*Math.cos(startAngle), y1=CY+R*Math.sin(startAngle);
+    const x2=CX+R*Math.cos(startAngle+angle), y2=CY+R*Math.sin(startAngle+angle);
+    const large=angle>Math.PI?1:0;
+    const pct=Math.round(n/total*100);
+    slices+=`<path d="M${CX},${CY} L${x1},${y1} A${R},${R} 0 ${large},1 ${x2},${y2} Z"
+      fill="${TIPO_COLOR[tp]}" opacity="0.9"
+      data-lbl="${TIPO_LABEL[tp]}: ${n} (${pct}%)"
+      style="cursor:pointer"
+      onmouseenter="showTip(event,this.dataset.lbl)"
+      onmousemove="moveTip(event)"
+      onmouseleave="hideTip()"
+    />`;
+    // etiqueta % dentro del slice si hay espacio
+    const midA=startAngle+angle/2;
+    if(pct>8) slices+=`<text x="${CX+R*0.65*Math.cos(midA)}" y="${CY+R*0.65*Math.sin(midA)+4}"
+      text-anchor="middle" font-size="12" font-weight="700" fill="white" pointer-events="none">${pct}%</text>`;
+    startAngle+=angle;
+  });
+
+  const el=document.getElementById("chart-tipo-dist");
+  if(el) el.innerHTML=`<svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}">${slices}</svg>`;
+
+  const leg=document.getElementById("tipo-dist-legend");
+  if(leg) leg.innerHTML = TIPOS.map(tp=>{
+    const n=vis.filter(d=>d.tipo===tp).length;
+    const pct=total?Math.round(n/total*100):0;
+    return `<div class="legend-item"><div class="legend-dot" style="background:${TIPO_COLOR[tp]}"></div>${TIPO_LABEL[tp]}: <strong>${n}</strong> (${pct}%)</div>`;
+  }).join("");
+}
+
 function renderGraficas(vis){
   renderDona(vis);
   renderAreasBars(vis);
   renderRespBars(vis);
   renderOpBars(vis);
+  renderTipoEstBars(vis);
+  renderTipoDist(vis);
   renderDiaBars(vis);
   renderLeaderComments();
 }
@@ -1496,7 +1633,7 @@ async function cargarDesdeMondayAPI() {
     }).filter(d => d.n);
 
     if (!nuevos.length) throw new Error("Sin items válidos en el tablero.");
-
+    normalizarDatos(nuevos);
     DATA = nuevos;
     reconstruirFiltros();
     render();
@@ -1568,14 +1705,7 @@ async function autoCargarDesdeRepo() {
     }
 
     if (!nuevos.length) throw new Error("Sin filas válidas en el archivo.");
-
-    // Normalizar estados
-    nuevos.forEach(d => {
-      if (d.est === "COMPLETADO") d.est = "COMPLETED";
-      else if (d.est === "EN PROCESO" || d.est === "EN PROGRESO") d.est = "IN PROCESS";
-      else if (d.est === "NO INICIADO") d.est = "NOT STARTED";
-    });
-
+    normalizarDatos(nuevos);
     DATA = nuevos;
     reconstruirFiltros();
     render();
